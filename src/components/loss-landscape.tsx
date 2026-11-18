@@ -121,7 +121,7 @@ export function LossLandscape() {
       path.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y));
       context.stroke();
 
-      // End the landscape before the rotating volume, leaving the dot free to enter it.
+      // End the landscape before the network, leaving the dot free to enter it.
       const fade = gridAxis === "x"
         ? context.createLinearGradient(Math.max(0, gridLimit - 65), 0, gridLimit, 0)
         : context.createLinearGradient(0, Math.max(0, gridLimit - 45), 0, gridLimit);

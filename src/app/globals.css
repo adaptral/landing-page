@@ -6,6 +6,7 @@
 * { box-sizing: border-box; }
 
 html, body { margin: 0; min-height: 100%; background: var(--background); }
+html.in-studies { overflow: hidden; }
 
 body {
   color: var(--white);
@@ -29,6 +30,7 @@ body {
   pointer-events: none;
   overflow: hidden;
   mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 88%, transparent);
+  transition: opacity 0.8s ease;
 }
 
 .loss-landscape canvas { display: block; width: 100%; height: 100%; }
@@ -61,6 +63,16 @@ body {
   position: relative;
   z-index: 1;
   padding-bottom: 2px;
+  transition: opacity 0.55s ease, transform 0.9s cubic-bezier(0.5, 0, 0.2, 1), filter 0.55s ease;
+}
+
+/* Diving into the network: the page falls away behind the camera. */
+.landing[data-mode="studies"] .loss-landscape { opacity: 0; }
+.landing[data-mode="studies"] .introduction {
+  opacity: 0;
+  transform: translateX(-56px) scale(0.94);
+  filter: blur(8px);
+  pointer-events: none;
 }
 
 .backing {
@@ -130,10 +142,233 @@ h1 > .headline-glow {
   height: min(820px, 88svh);
   min-height: 450px;
   margin-top: 8px;
-  overflow: hidden;
 }
 
-.matrix canvas { display: block; width: 100%; height: 100%; }
+/* The network paints on a viewport-sized canvas so it can grow past its column. */
+.network-stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.network-stage canvas { display: block; width: 100%; height: 100%; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 34px 0 0 4px; }
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.cta:focus-visible, .studies-back:focus-visible, .study:focus-visible, .study-close:focus-visible {
+  outline: 1px solid #dbe7ff;
+  outline-offset: 4px;
+}
+
+.cta-primary { background: #f5f8ff; color: #000; }
+.cta-primary:hover { background: #fff; box-shadow: 0 0 30px rgba(190, 205, 255, 0.35); }
+
+.cta-secondary {
+  background: linear-gradient(#05070b, #05070b) padding-box, linear-gradient(90deg, rgba(226, 236, 255, 0.3), rgba(226, 236, 255, 0.3)) border-box;
+  color: #f5f8ff;
+}
+.cta-secondary:hover {
+  background: linear-gradient(#05070b, #05070b) padding-box, linear-gradient(90deg, #ff91b3, #f5c582, #8be8d7, #989bff) border-box;
+  box-shadow: 0 0 30px rgba(152, 155, 255, 0.22);
+}
+.cta-arrow { transition: transform 0.25s ease; }
+.cta-secondary:hover .cta-arrow { transform: translateX(3px); }
+
+/* Inside the network: case studies sit where the neurons were. */
+.studies {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  padding: 104px 24px 64px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.landing[data-mode="studies"] .studies { overflow-y: auto; pointer-events: auto; }
+
+.studies-chrome { opacity: 0; transition: opacity 0.4s ease; }
+.landing[data-mode="studies"] .studies-chrome { opacity: 1; transition: opacity 0.6s ease 1.3s; }
+
+.studies-back {
+  position: fixed;
+  top: clamp(26px, 4.2vw, 58px);
+  right: clamp(28px, 6.25vw, 112px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid rgba(226, 236, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(5, 7, 11, 0.8);
+  color: #f5f8ff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 520;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.studies-back:hover { border-color: rgba(226, 236, 255, 0.7); background: rgba(20, 24, 34, 0.9); }
+
+.studies-hint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  margin: 0;
+  color: rgba(226, 236, 255, 0.5);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  pointer-events: none;
+}
+
+.studies-grid {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, auto);
+  column-gap: clamp(84px, 10vw, 180px);
+  row-gap: clamp(36px, 8vh, 84px);
+  margin: auto;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.study {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: clamp(200px, 18.5vw, 272px);
+  padding: 10px 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: linear-gradient(#07090e, #07090e) padding-box, linear-gradient(90deg, rgba(226, 236, 255, 0.2), rgba(226, 236, 255, 0.2)) border-box;
+  color: #f5f8ff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, translate 0.3s ease;
+}
+.study:hover, .study:focus-visible {
+  background: linear-gradient(#090c13, #090c13) padding-box, linear-gradient(120deg, #ff91b3, #f5c582, #8be8d7, #989bff) border-box;
+  box-shadow: 0 0 44px rgba(152, 155, 255, 0.2);
+  translate: 0 -3px;
+}
+
+.study-image, .study-detail-image {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 9px;
+  background: repeating-linear-gradient(135deg, rgba(226, 236, 255, 0.055) 0 8px, transparent 8px 16px), #0b0e15;
+  color: rgba(226, 236, 255, 0.42);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+}
+.study-image { height: clamp(60px, 11vh, 108px); margin-bottom: 7px; }
+.study-image img, .study-detail-image img { width: 100%; height: 100%; object-fit: cover; }
+
+.study-sector {
+  margin: 0;
+  padding: 0 4px;
+  color: rgba(226, 236, 255, 0.55);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+.study-company { padding: 0 4px; font-size: 19px; font-weight: 560; letter-spacing: -0.04em; }
+.study-brief { padding: 0 4px; color: #c9d1e0; font-size: 13px; line-height: 1.45; letter-spacing: -0.015em; }
+.study-more { margin-top: 5px; padding: 0 4px; color: rgba(226, 236, 255, 0.72); font-size: 12.5px; font-weight: 520; letter-spacing: -0.015em; }
+.study:hover .study-more { color: #fff; }
+
+.study-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  padding: 24px 16px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  animation: study-fade 0.3s ease both;
+}
+
+.study-detail {
+  position: relative;
+  width: min(680px, 100%);
+  margin: auto;
+  padding: 14px 14px 30px;
+  border: 1px solid rgba(226, 236, 255, 0.2);
+  border-radius: 22px;
+  background: #07090e;
+  box-shadow: 0 0 90px rgba(152, 155, 255, 0.16);
+  animation: study-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.study-detail > :not(.study-detail-image, .study-close) { margin-left: 18px; margin-right: 18px; }
+.study-detail-image { height: clamp(140px, 28vh, 250px); margin-bottom: 24px; border-radius: 12px; font-size: 12px; }
+.study-detail h2 { margin-top: 6px; margin-bottom: 0; font-size: clamp(30px, 4vw, 42px); font-weight: 520; letter-spacing: -0.055em; line-height: 1.1; }
+.study-detail .study-sector { padding: 0; font-size: 11.5px; }
+.study-lead { margin-top: 12px; margin-bottom: 0; color: #dbe2ee; font-size: 16px; line-height: 1.55; letter-spacing: -0.02em; }
+
+.study-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 24px;
+  margin-bottom: 26px;
+}
+.study-metrics > div { display: flex; flex-direction: column-reverse; gap: 4px; padding: 14px 14px 12px; border: 1px solid rgba(226, 236, 255, 0.13); border-radius: 12px; }
+.study-metrics dd { margin: 0; font-family: "IBM Plex Mono", monospace; font-size: clamp(20px, 3vw, 26px); letter-spacing: -0.03em; }
+.study-metrics dt { color: rgba(226, 236, 255, 0.55); font-size: 12px; letter-spacing: -0.01em; }
+
+.study-part h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; letter-spacing: -0.02em; }
+.study-part p { margin: 0 0 20px; color: #c9d1e0; font-size: 14.5px; line-height: 1.65; letter-spacing: -0.015em; }
+.study-detail > .cta { margin-top: 6px; }
+
+.study-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(226, 236, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(5, 7, 11, 0.85);
+  color: #f5f8ff;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.study-close:hover { border-color: rgba(226, 236, 255, 0.7); }
+
+@keyframes study-fade { from { opacity: 0; } }
+@keyframes study-rise { from { opacity: 0; transform: translateY(18px) scale(0.97); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .introduction, .loss-landscape, .studies-chrome, .study, .cta, .cta-arrow { transition: none !important; }
+  .study-backdrop, .study-detail { animation: none; }
+}
 
 .sr-only {
   position: absolute;
@@ -171,5 +406,27 @@ h1 > .headline-glow {
   h1 { font-size: clamp(38px, 10.5vw, 70px); line-height: 1.1; }
   .backing { margin-bottom: 26px; margin-left: 2px; width: 294px; }
   .introduction p { margin: 22px 0 0 2px; font-size: 15px; }
+  .actions { margin: 26px 0 0 2px; gap: 10px; }
+  .cta { height: 44px; padding: 0 19px; font-size: 14.5px; }
+  .studies { padding: 92px 18px 58px; }
+  .studies-back { top: 24px; right: 22px; }
+  .studies-hint { bottom: 16px; font-size: 10px; }
+  .studies-grid {
+    grid-auto-flow: row;
+    grid-template-rows: none;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 26px;
+    row-gap: clamp(40px, 7.5vh, 66px);
+    width: min(100%, 400px);
+  }
+  .study { width: auto; padding: 8px 8px 11px; border-radius: 14px; gap: 3px; }
+  .study-image { height: clamp(44px, 8vh, 64px); margin-bottom: 5px; font-size: 9.5px; }
+  .study-sector { font-size: 9px; }
+  .study-company { font-size: 16px; }
+  .study-brief { display: none; }
+  .study-more { margin-top: 3px; font-size: 11.5px; }
+  .study-detail > :not(.study-detail-image, .study-close) { margin-left: 8px; margin-right: 8px; }
+  .study-metrics { gap: 7px; }
+  .study-metrics > div { padding: 11px 10px 9px; }
   .matrix { height: min(100vw, 540px); min-height: 310px; margin-top: 16px; }
 }
