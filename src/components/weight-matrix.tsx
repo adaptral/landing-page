@@ -19,7 +19,6 @@ type ProjectedWeight = {
 };
 
 const MUTATION_DURATION = 2.25;
-const TAU = Math.PI * 2;
 
 function makeLattice(side: number) {
   const weights: Weight[] = [];
@@ -134,7 +133,7 @@ export function WeightMatrix() {
           weight.mutation = { from: weight.value, to: target, start: time, hue: random() * 360 };
           firstMutation = false;
         }
-        nextMutation = time + 0.38 + random() * 0.42;
+        nextMutation = time + 0.95 + random() * 0.9;
       }
 
       // Keep the connective web quiet, with only the active synapses in color.
@@ -154,13 +153,13 @@ export function WeightMatrix() {
         const energy = Math.sin(Math.min(1, age / MUTATION_DURATION) * Math.PI);
         const hue = (mutation.hue + age * 170) % 360;
         const gradient = context.createLinearGradient(start.x, start.y, end.x, end.y);
-        gradient.addColorStop(0, `hsla(${hue},100%,68%,${energy})`);
-        gradient.addColorStop(0.5, `hsla(${hue + 100},100%,75%,${energy * 0.85})`);
-        gradient.addColorStop(1, `hsla(${hue + 220},100%,70%,${energy * 0.35})`);
+        gradient.addColorStop(0, `hsla(${hue},100%,72%,${energy * 0.4})`);
+        gradient.addColorStop(0.5, `hsla(${hue + 100},100%,75%,${energy * 0.3})`);
+        gradient.addColorStop(1, `hsla(${hue + 220},100%,70%,${energy * 0.12})`);
         context.strokeStyle = gradient;
-        context.lineWidth = 1.45;
-        context.shadowColor = `hsla(${hue + 80},100%,68%,${energy * 0.7})`;
-        context.shadowBlur = 8 * energy;
+        context.lineWidth = 0.85;
+        context.shadowColor = `hsla(${hue + 80},100%,68%,${energy * 0.3})`;
+        context.shadowBlur = 3 * energy;
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.lineTo(end.x, end.y);
@@ -188,11 +187,11 @@ export function WeightMatrix() {
           const eased = 1 - Math.pow(1 - progress, 3);
           const energy = Math.sin((age / MUTATION_DURATION) * Math.PI);
           const hue = (mutation.hue + age * 170) % 360;
-          const radius = fontSize * (2 + energy * 1.7);
+          const radius = fontSize * (1.6 + energy * 0.95);
 
           const glow = context.createRadialGradient(point.x, point.y, 0, point.x, point.y, radius);
-          glow.addColorStop(0, `hsla(${hue},100%,68%,${energy * 0.52})`);
-          glow.addColorStop(0.5, `hsla(${hue + 90},100%,60%,${energy * 0.2})`);
+          glow.addColorStop(0, `hsla(${hue},100%,68%,${energy * 0.22})`);
+          glow.addColorStop(0.5, `hsla(${hue + 90},100%,60%,${energy * 0.07})`);
           glow.addColorStop(1, `hsla(${hue + 180},100%,60%,0)`);
           context.fillStyle = glow;
           context.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
@@ -205,20 +204,10 @@ export function WeightMatrix() {
           }
           context.fillStyle = rainbow;
           context.shadowColor = `hsla(${hue + 65},100%,70%,${energy})`;
-          context.shadowBlur = 21 * energy;
-          context.font = `400 ${(fontSize * (1 + energy * 0.28)).toFixed(2)}px "IBM Plex Mono", monospace`;
-          context.fillText(formatWeight(value), point.x, point.y - Math.sin(progress * Math.PI) * 3);
+          context.shadowBlur = 10 * energy;
+          context.font = `400 ${(fontSize * (1 + energy * 0.08)).toFixed(2)}px "IBM Plex Mono", monospace`;
+          context.fillText(formatWeight(value), point.x, point.y - Math.sin(progress * Math.PI));
           context.shadowBlur = 0;
-
-          // A fine spectral ripple marks the moment the new weight takes hold.
-          if (age > 0.65 && age < 1.65) {
-            const ripple = (age - 0.65) / 1;
-            context.strokeStyle = `hsla(${hue + 150},100%,76%,${(1 - ripple) * 0.6})`;
-            context.lineWidth = 0.7;
-            context.beginPath();
-            context.ellipse(point.x, point.y, fontSize * (1.8 + ripple * 2), fontSize * (0.8 + ripple * 1.5), -0.3, 0, TAU);
-            context.stroke();
-          }
         } else {
           context.fillStyle = `rgba(239,246,255,${point.opacity})`;
           context.fillText(formatWeight(weight.value), point.x, point.y);

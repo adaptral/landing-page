@@ -15,12 +15,8 @@ export default function Home() {
       <div className="composition">
         <div className="introduction">
           <a className="backing" href="https://www.joinef.com/" target="_blank" rel="noreferrer">
-            <span>Backed by</span>
-            <span className="ef-wordmark">
-              {/* Keep the original brand artwork; screen blending removes its dark ground. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/entrepreneurs-first.png" alt="Entrepreneurs First" width="156" height="156" />
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/ef-backing.png" alt="Backed by Entrepreneurs First" width="480" height="86" />
           </a>
           <h1>
             <span className="headline-glow" aria-hidden="true">Intelligence<br />shaped around<br />you.</span>

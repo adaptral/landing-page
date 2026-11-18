@@ -40,6 +40,7 @@ export function LossLandscape() {
     let height = 1;
     let paths: Path2D[] = [];
     let path: Point[] = [];
+    let sweepPath: Point[] = [];
     let frame = 0;
     let previousTime = 0;
     let elapsed = 0;
@@ -48,74 +49,77 @@ export function LossLandscape() {
     let disposed = false;
 
     const project = (x: number, z: number): Point => {
-      const unit = Math.max(width * 0.116, height * 0.16);
+      const mobile = width < 700;
+      const unit = mobile ? width * 0.21 : Math.max(width * 0.116, height * 0.16);
       const rx = x * 0.97 + z * 0.243;
       const depth = -x * 0.243 + z * 0.97;
       const perspective = 10 / (10 + depth);
       return {
-        x: width * 0.49 + rx * unit * perspective,
-        y: height * 0.68 + (depth * 0.46 - loss(x, z) * 0.72) * unit * perspective,
+        x: width * (mobile ? 0.16 : 0.28) + rx * unit * perspective,
+        y: height * (mobile ? 0.43 : 0.65) + (depth * 0.46 - loss(x, z) * 0.72) * unit * perspective,
       };
     };
 
     const render = (time: number) => {
       context.clearRect(0, 0, width, height);
+      if (sweepPath.length < 2) return;
 
-      // A wide, quiet spectral wave moves across the wireframe.
-      const sweep = ((time / 23) % 1) * 1.6 - 0.3;
-      const gradient = context.createLinearGradient(0, height * 0.25, width, height * 0.85);
+      const position = ((time / 18 + 0.16) % 1) * (sweepPath.length - 1);
+      const head = Math.floor(position);
+      const fraction = position - head;
+      const a = sweepPath[head];
+      const b = sweepPath[Math.min(head + 1, sweepPath.length - 1)];
+      const point = { x: a.x + (b.x - a.x) * fraction, y: a.y + (b.y - a.y) * fraction };
+
+      // The broad wave and its surface-hugging beam both travel left to right.
+      const sweep = motion.matches ? 0.4 : point.x / width;
+      const gradient = context.createLinearGradient(0, 0, width, 0);
       const stops: [number, string][] = [
-        [0, "rgba(178,198,231,0.035)"],
-        [sweep - 0.18, "rgba(178,198,231,0.035)"],
-        [sweep - 0.11, "rgba(255,145,179,0.09)"],
-        [sweep - 0.04, "rgba(245,197,130,0.085)"],
-        [sweep + 0.03, "rgba(139,232,215,0.09)"],
-        [sweep + 0.1, "rgba(152,155,255,0.11)"],
-        [sweep + 0.18, "rgba(178,198,231,0.035)"],
-        [1, "rgba(178,198,231,0.035)"],
+        [0, "rgba(178,198,231,0.085)"],
+        [sweep - 0.18, "rgba(178,198,231,0.085)"],
+        [sweep - 0.11, "rgba(255,145,179,0.25)"],
+        [sweep - 0.04, "rgba(245,197,130,0.23)"],
+        [sweep + 0.03, "rgba(139,232,215,0.25)"],
+        [sweep + 0.1, "rgba(152,155,255,0.28)"],
+        [sweep + 0.18, "rgba(178,198,231,0.085)"],
+        [1, "rgba(178,198,231,0.085)"],
       ];
       stops.filter(([position]) => position >= 0 && position <= 1)
         .sort(([a], [b]) => a - b)
         .forEach(([position, color]) => gradient.addColorStop(position, color));
       context.strokeStyle = gradient;
-      context.lineWidth = 0.75;
+      context.lineWidth = 0.85;
       for (const meshLine of paths) context.stroke(meshLine);
 
       // This trace is computed with gradient descent on the surface above.
       if (path.length < 2) return;
-      context.strokeStyle = "rgba(178,180,245,0.06)";
+      context.strokeStyle = "rgba(178,180,245,0.09)";
       context.lineWidth = 1;
       context.beginPath();
       path.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y));
       context.stroke();
 
       if (motion.matches) return;
-      const position = ((time / 14) % 1) * (path.length - 1);
-      const head = Math.floor(position);
-      const fraction = position - head;
-      const a = path[head];
-      const b = path[Math.min(head + 1, path.length - 1)];
-      const point = { x: a.x + (b.x - a.x) * fraction, y: a.y + (b.y - a.y) * fraction };
       const hue = 180 + Math.sin(time * 0.3) * 100;
 
       for (let index = Math.max(1, head - 26); index <= head; index++) {
         const energy = 1 - (head - index) / 27;
-        context.strokeStyle = `hsla(${hue + index * 3},100%,75%,${energy * 0.22})`;
-        context.lineWidth = 1.15;
+        context.strokeStyle = `hsla(${hue + index * 3},100%,75%,${energy * 0.32})`;
+        context.lineWidth = 1.25;
         context.beginPath();
-        context.moveTo(path[index - 1].x, path[index - 1].y);
-        context.lineTo(path[index].x, path[index].y);
+        context.moveTo(sweepPath[index - 1].x, sweepPath[index - 1].y);
+        context.lineTo(sweepPath[index].x, sweepPath[index].y);
         context.stroke();
       }
 
-      const halo = context.createRadialGradient(point.x, point.y, 0, point.x, point.y, 34);
-      halo.addColorStop(0, `hsla(${hue},100%,70%,0.1)`);
+      const halo = context.createRadialGradient(point.x, point.y, 0, point.x, point.y, 42);
+      halo.addColorStop(0, `hsla(${hue},100%,70%,0.14)`);
       halo.addColorStop(1, `hsla(${hue + 70},100%,70%,0)`);
       context.fillStyle = halo;
-      context.fillRect(point.x - 34, point.y - 34, 68, 68);
-      context.fillStyle = `hsla(${hue},100%,83%,0.45)`;
+      context.fillRect(point.x - 42, point.y - 42, 84, 84);
+      context.fillStyle = `hsla(${hue},100%,83%,0.65)`;
       context.shadowColor = `hsla(${hue},100%,70%,0.4)`;
-      context.shadowBlur = 8;
+      context.shadowBlur = 12;
       context.beginPath();
       context.arc(point.x, point.y, 1.5, 0, Math.PI * 2);
       context.fill();
@@ -146,6 +150,11 @@ export function LossLandscape() {
         }
       }
       path = trajectory.map(({ x, z }) => project(x, z));
+      sweepPath = Array.from({ length: 180 }, (_, index) => {
+        const x = -5.5 + (index / 179) * 12.5;
+        const z = 0.1 + Math.sin((x - 0.9) * 0.5) * 0.5;
+        return project(x, z);
+      });
       render(elapsed);
     };
 
