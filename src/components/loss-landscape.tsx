@@ -1,8 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { matrixGeometry } from "./matrix-geometry";
 
 type Point = { x: number; y: number };
+
+const SPECTRUM = [
+  { offset: -0.18, rgb: [178, 198, 231], alpha: 0.085, tint: 0 },
+  { offset: -0.11, rgb: [255, 145, 179], alpha: 0.25, tint: 0.36 },
+  { offset: -0.04, rgb: [245, 197, 130], alpha: 0.23, tint: 0.36 },
+  { offset: 0.03, rgb: [139, 232, 215], alpha: 0.25, tint: 0.36 },
+  { offset: 0.1, rgb: [152, 155, 255], alpha: 0.28, tint: 0.36 },
+  { offset: 0.18, rgb: [178, 198, 231], alpha: 0.085, tint: 0 },
+];
+
+function smoothstep(start: number, end: number, value: number) {
+  const t = Math.max(0, Math.min(1, (value - start) / (end - start)));
+  return t * t * (3 - 2 * t);
+}
 
 // A smooth loss surface with a hill and a basin, rather than a flat decorative grid.
 function loss(x: number, z: number) {
@@ -33,6 +48,9 @@ export function LossLandscape() {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
+    const root = canvas.closest<HTMLElement>(".landing");
+    const headline = root?.querySelector<HTMLElement>("h1");
+    const matrix = root?.querySelector<HTMLElement>(".matrix");
 
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const trajectory = descent();
@@ -41,6 +59,9 @@ export function LossLandscape() {
     let paths: Path2D[] = [];
     let path: Point[] = [];
     let sweepPath: Point[] = [];
+    let headlineX = 0;
+    let gridLimit = 0;
+    let gridAxis: "x" | "y" = "x";
     let frame = 0;
     let previousTime = 0;
     let elapsed = 0;
@@ -64,7 +85,10 @@ export function LossLandscape() {
       context.clearRect(0, 0, width, height);
       if (sweepPath.length < 2) return;
 
-      const position = ((time / 18 + 0.16) % 1) * (sweepPath.length - 1);
+      const cycle = (time / 18) % 1;
+      const travel = Math.min(1, cycle / 0.86);
+      const strength = motion.matches ? 0 : 1 - smoothstep(0.88, 1, travel);
+      const position = travel * (sweepPath.length - 1);
       const head = Math.floor(position);
       const fraction = position - head;
       const a = sweepPath[head];
@@ -72,16 +96,14 @@ export function LossLandscape() {
       const point = { x: a.x + (b.x - a.x) * fraction, y: a.y + (b.y - a.y) * fraction };
 
       // The broad wave and its surface-hugging beam both travel left to right.
-      const sweep = motion.matches ? 0.4 : point.x / width;
+      const sweep = point.x / width;
       const gradient = context.createLinearGradient(0, 0, width, 0);
       const stops: [number, string][] = [
         [0, "rgba(178,198,231,0.085)"],
-        [sweep - 0.18, "rgba(178,198,231,0.085)"],
-        [sweep - 0.11, "rgba(255,145,179,0.25)"],
-        [sweep - 0.04, "rgba(245,197,130,0.23)"],
-        [sweep + 0.03, "rgba(139,232,215,0.25)"],
-        [sweep + 0.1, "rgba(152,155,255,0.28)"],
-        [sweep + 0.18, "rgba(178,198,231,0.085)"],
+        ...SPECTRUM.map(({ offset, rgb, alpha }): [number, string] => [
+          sweep + offset,
+          `rgba(${rgb.join(",")},${0.085 + (alpha - 0.085) * strength})`,
+        ]),
         [1, "rgba(178,198,231,0.085)"],
       ];
       stops.filter(([position]) => position >= 0 && position <= 1)
@@ -99,8 +121,30 @@ export function LossLandscape() {
       path.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y));
       context.stroke();
 
-      if (motion.matches) return;
-      const hue = 180 + Math.sin(time * 0.3) * 100;
+      // End the landscape before the rotating volume, leaving the dot free to enter it.
+      const fade = gridAxis === "x"
+        ? context.createLinearGradient(Math.max(0, gridLimit - 65), 0, gridLimit, 0)
+        : context.createLinearGradient(0, Math.max(0, gridLimit - 45), 0, gridLimit);
+      fade.addColorStop(0, "#fff");
+      fade.addColorStop(1, "rgba(255,255,255,0)");
+      context.globalCompositeOperation = "destination-in";
+      context.fillStyle = fade;
+      context.fillRect(0, 0, width, height);
+      context.globalCompositeOperation = "source-over";
+
+      // One moving light supplies the exact same positions and hues to the text.
+      if (headline) {
+        const white = [245, 248, 255];
+        const colors = SPECTRUM.map(({ offset, rgb, tint }) => {
+          const color = white.map((base, channel) => Math.round(base + (rgb[channel] - base) * tint * strength));
+          return `rgb(${color.join(",")}) ${(point.x - headlineX + offset * width).toFixed(1)}px`;
+        });
+        headline.style.backgroundImage = `linear-gradient(90deg,${colors.join(",")})`;
+      }
+
+      if (motion.matches || strength <= 0) return;
+      const hue = 180;
+      context.globalAlpha = strength;
 
       for (let index = Math.max(1, head - 26); index <= head; index++) {
         const energy = 1 - (head - index) / 27;
@@ -124,12 +168,24 @@ export function LossLandscape() {
       context.arc(point.x, point.y, 1.5, 0, Math.PI * 2);
       context.fill();
       context.shadowBlur = 0;
+      context.globalAlpha = 1;
     };
 
     const resize = () => {
       const bounds = canvas.getBoundingClientRect();
       width = bounds.width;
       height = bounds.height;
+      const mobile = width < 700;
+      const matrixBounds = matrix?.getBoundingClientRect();
+      const headlineBounds = headline?.getBoundingClientRect();
+      headlineX = (headlineBounds?.left ?? bounds.left) - bounds.left;
+      const geometry = matrixGeometry(matrixBounds?.width ?? width * 0.56, matrixBounds?.height ?? height * 0.88);
+      const matrixX = (matrixBounds?.left ?? width * 0.44) - bounds.left;
+      const matrixY = (matrixBounds?.top ?? height * 0.55) - bounds.top;
+      gridAxis = mobile ? "y" : "x";
+      gridLimit = mobile
+        ? matrixY + geometry.centerY - geometry.radius - 22
+        : matrixX + geometry.centerX - geometry.radius - 24;
       const density = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(width * density);
       canvas.height = Math.round(height * density);
@@ -150,11 +206,39 @@ export function LossLandscape() {
         }
       }
       path = trajectory.map(({ x, z }) => project(x, z));
-      sweepPath = Array.from({ length: 180 }, (_, index) => {
-        const x = -5.5 + (index / 179) * 12.5;
+      const arrival = {
+        x: matrixX + geometry.centerX + geometry.unit * (mobile ? 0.7 : -0.75),
+        y: matrixY + geometry.centerY - geometry.unit * 0.1,
+      };
+      const surfaceEndX = mobile ? width * 0.51 : arrival.x;
+      const surfacePath = Array.from({ length: 240 }, (_, index) => {
+        const x = -5.5 + (index / 239) * 12.5;
         const z = 0.1 + Math.sin((x - 0.9) * 0.5) * 0.5;
         return project(x, z);
       });
+      sweepPath = [];
+      for (let index = 1; index < surfacePath.length; index++) {
+        const a = surfacePath[index - 1];
+        const b = surfacePath[index];
+        const atX = (x: number) => ({ x, y: a.y + (b.y - a.y) * ((x - a.x) / (b.x - a.x)) });
+        if (a.x <= -24 && b.x > -24) sweepPath.push(atX(-24));
+        if (b.x > -24 && b.x < surfaceEndX) sweepPath.push(b);
+        if (a.x <= surfaceEndX && b.x >= surfaceEndX) {
+          sweepPath.push(atX(surfaceEndX));
+          break;
+        }
+      }
+      if (mobile && sweepPath.length) {
+        const from = sweepPath[sweepPath.length - 1];
+        for (let index = 1; index <= 35; index++) {
+          const t = index / 35;
+          const u = 1 - t;
+          sweepPath.push({
+            x: u ** 3 * from.x + 3 * u * u * t * (from.x + 25) + 3 * u * t * t * (arrival.x - 20) + t ** 3 * arrival.x,
+            y: u ** 3 * from.y + 3 * u * u * t * (from.y + 30) + 3 * u * t * t * (arrival.y - 65) + t ** 3 * arrival.y,
+          });
+        }
+      }
       render(elapsed);
     };
 
@@ -183,11 +267,14 @@ export function LossLandscape() {
       syncPlayback();
     });
     resizeObserver.observe(canvas);
+    if (headline) resizeObserver.observe(headline);
+    if (matrix) resizeObserver.observe(matrix);
     intersectionObserver.observe(canvas);
     motion.addEventListener("change", syncPlayback);
     document.addEventListener("visibilitychange", syncPlayback);
     resize();
     syncPlayback();
+    void document.fonts.ready.then(() => { if (!disposed) resize(); });
 
     return () => {
       disposed = true;
@@ -196,6 +283,7 @@ export function LossLandscape() {
       intersectionObserver.disconnect();
       motion.removeEventListener("change", syncPlayback);
       document.removeEventListener("visibilitychange", syncPlayback);
+      headline?.style.removeProperty("background-image");
     };
   }, []);
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { matrixGeometry, matrixSide } from "./matrix-geometry";
 
 type Weight = {
   x: number;
@@ -63,7 +64,7 @@ export function WeightMatrix() {
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
 
-    let side = canvas.getBoundingClientRect().width < 480 ? 6 : 8;
+    let side = matrixSide(canvas.getBoundingClientRect().width);
     let { weights, edges, random } = makeLattice(side);
     let projected: ProjectedWeight[] = weights.map(() => ({ x: 0, y: 0, z: 0, scale: 1, opacity: 1 }));
     let order = weights.map((_, index) => index);
@@ -80,7 +81,7 @@ export function WeightMatrix() {
     let disposed = false;
 
     const render = (time: number) => {
-      const unit = Math.min(width * 0.258, height * 0.285);
+      const { unit, centerX, centerY } = matrixGeometry(width, height);
       const yaw = -0.56 + time * 0.055;
       const pitch = -0.23 + Math.sin(time * 0.065) * 0.055;
       const roll = -0.085;
@@ -108,8 +109,8 @@ export function WeightMatrix() {
         const perspective = 4.8 / (4.8 - depth);
 
         projected[index] = {
-          x: width * 0.5 + (rx * cr - ry * sr) * unit * perspective,
-          y: height * 0.51 + (rx * sr + ry * cr) * unit * perspective,
+          x: centerX + (rx * cr - ry * sr) * unit * perspective,
+          y: centerY + (rx * sr + ry * cr) * unit * perspective,
           z: depth,
           scale: perspective,
           opacity: Math.max(0.25, Math.min(1, 0.62 + depth * 0.27)),
@@ -176,7 +177,7 @@ export function WeightMatrix() {
       for (const index of order) {
         const weight = weights[index];
         const point = projected[index];
-        const fontSize = Math.max(7.5, Math.min(13.5, unit * 0.059)) * point.scale;
+        const fontSize = Math.max(9, Math.min(13.5, unit * 0.072)) * point.scale;
         context.font = `400 ${fontSize.toFixed(2)}px "IBM Plex Mono", monospace`;
         const mutation = weight.mutation;
         const boxWidth = fontSize * 2.65;
@@ -238,7 +239,7 @@ export function WeightMatrix() {
       const bounds = canvas.getBoundingClientRect();
       width = bounds.width;
       height = bounds.height;
-      const nextSide = width < 480 ? 6 : 8;
+      const nextSide = matrixSide(width);
       if (nextSide !== side) {
         side = nextSide;
         ({ weights, edges, random } = makeLattice(side));
@@ -284,7 +285,7 @@ export function WeightMatrix() {
   return (
     <div className="matrix" role="img" aria-label="A slowly rotating three-dimensional lattice of numerical weights, with individual values changing in fluorescent rainbow light.">
       <canvas ref={canvasRef} aria-hidden="true" />
-      <span className="sr-only">Hundreds of connected numerical weights form a three-dimensional matrix.</span>
+      <span className="sr-only">A sparse lattice of connected numerical weights forms a three-dimensional matrix.</span>
     </div>
   );
 }
