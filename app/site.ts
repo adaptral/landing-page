@@ -26,8 +26,10 @@ export const site = {
     instagram: "https://www.instagram.com/adaptral",
   },
   analytics: {
+    // Tag Manager container and Clarity project. Public by nature (they ship in the HTML), so they have defaults.
+    gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-WL5XNF6H",
+    clarityId: process.env.NEXT_PUBLIC_CLARITY_ID ?? "zfi6gshmki",
     gaId: process.env.NEXT_PUBLIC_GA_ID,
-    clarityId: process.env.NEXT_PUBLIC_CLARITY_ID,
     googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION,
   },
 };

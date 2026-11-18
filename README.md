@@ -29,10 +29,11 @@ Import the repository; the defaults work. Then set these in Project > Settings >
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin. Defaults to `https://adaptral.com`. |
 | `NEXT_PUBLIC_BOOKING_URL` | Target of "Book a call with us". The default is a placeholder. |
-| `NEXT_PUBLIC_GA_ID` | GA4 measurement ID (`G-…`). |
-| `NEXT_PUBLIC_CLARITY_ID` | Microsoft Clarity project ID. |
+| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager container. Defaults to `GTM-WL5XNF6H`. |
+| `NEXT_PUBLIC_GA_ID` | GA4 measurement ID (`G-…`), loaded directly. Leave unset if GA4 runs inside GTM. |
+| `NEXT_PUBLIC_CLARITY_ID` | Microsoft Clarity project. Defaults to `zfi6gshmki`. |
 | `GOOGLE_SITE_VERIFICATION` | Search Console HTML-tag token. |
 
-Analytics scripts load only when their ID is set. Clicking either booking link sends a
+Tag Manager and Clarity always load; GA4 loads directly only when its ID is set. Clicking either booking link sends a
 `book_call_click` event to GA4 (with `location: header | cta`) and to Clarity; mark it as a key event in GA4.
 After the first deploy, submit `https://adaptral.com/sitemap.xml` in Search Console.
