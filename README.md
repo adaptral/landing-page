@@ -6,6 +6,7 @@ One static page: Next.js (App Router), no runtime dependencies beyond Next and R
 npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build, fully static
+npm run lint     # eslint, plus a check that globals.css uses tokens (no raw hex, rem or px)
 npm run logos    # regenerate logo/ and the icons the site serves
 ```
 
@@ -15,7 +16,8 @@ npm run logos    # regenerate logo/ and the icons the site serves
 | --- | --- |
 | Copy | `app/page.tsx` |
 | Title, description, keywords, links, booking URL | `app/site.ts` |
-| Styles (light and dark) | `app/globals.css` |
+| Design tokens (colour, type, space, shape, motion; light, dark and compact) | `app/tokens.css` |
+| Styles, built only from tokens | `app/globals.css` |
 | Metadata, JSON-LD, GA4, Clarity | `app/layout.tsx` |
 | robots.txt, sitemap.xml, manifest | `app/robots.ts`, `app/sitemap.ts`, `app/manifest.ts` |
 | Logo kit and its generator | `logo/`, `scripts/build-logos.mjs` |

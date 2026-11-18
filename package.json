@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "logos": "node scripts/build-logos.mjs"
+    "lint": "eslint && npm run check:tokens",
+    "logos": "node scripts/build-logos.mjs",
+    "check:tokens": "! grep -nE '#[0-9a-fA-F]{3,8}\\b|[0-9.]+(rem|px)' app/globals.css | grep -v '@media'"
   },
   "dependencies": {
     "next": "16.4.6",
