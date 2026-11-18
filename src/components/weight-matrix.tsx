@@ -61,7 +61,7 @@ export function WeightMatrix() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d", { alpha: false });
+    const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
 
     let side = canvas.getBoundingClientRect().width < 480 ? 6 : 8;
@@ -92,8 +92,7 @@ export function WeightMatrix() {
       const cr = Math.cos(roll);
       const sr = Math.sin(roll);
 
-      context.fillStyle = "#000";
-      context.fillRect(0, 0, width, height);
+      context.clearRect(0, 0, width, height);
 
       for (let index = 0; index < weights.length; index++) {
         const weight = weights[index];
@@ -159,11 +158,14 @@ export function WeightMatrix() {
         gradient.addColorStop(0.5, `hsla(${hue + 100},100%,75%,${energy * 0.85})`);
         gradient.addColorStop(1, `hsla(${hue + 220},100%,70%,${energy * 0.35})`);
         context.strokeStyle = gradient;
-        context.lineWidth = 1.1;
+        context.lineWidth = 1.45;
+        context.shadowColor = `hsla(${hue + 80},100%,68%,${energy * 0.7})`;
+        context.shadowBlur = 8 * energy;
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.lineTo(end.x, end.y);
         context.stroke();
+        context.shadowBlur = 0;
         context.lineWidth = 0.65;
       }
 
@@ -180,20 +182,17 @@ export function WeightMatrix() {
         const mutation = weight.mutation;
         const boxWidth = fontSize * 2.65;
 
-        context.fillStyle = "#000";
-        context.fillRect(point.x - boxWidth / 2, point.y - fontSize * 0.57, boxWidth, fontSize * 1.14);
-
         if (mutation) {
           const age = time - mutation.start;
-          const progress = Math.min(1, Math.max(0, (age - 0.12) / 0.95));
+          const progress = Math.min(1, Math.max(0, (age - 0.22) / 1.12));
           const eased = 1 - Math.pow(1 - progress, 3);
           const energy = Math.sin((age / MUTATION_DURATION) * Math.PI);
           const hue = (mutation.hue + age * 170) % 360;
-          const radius = fontSize * (1.7 + energy * 1.5);
+          const radius = fontSize * (2 + energy * 1.7);
 
           const glow = context.createRadialGradient(point.x, point.y, 0, point.x, point.y, radius);
-          glow.addColorStop(0, `hsla(${hue},100%,68%,${energy * 0.36})`);
-          glow.addColorStop(0.5, `hsla(${hue + 90},100%,60%,${energy * 0.13})`);
+          glow.addColorStop(0, `hsla(${hue},100%,68%,${energy * 0.52})`);
+          glow.addColorStop(0.5, `hsla(${hue + 90},100%,60%,${energy * 0.2})`);
           glow.addColorStop(1, `hsla(${hue + 180},100%,60%,0)`);
           context.fillStyle = glow;
           context.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
@@ -202,18 +201,19 @@ export function WeightMatrix() {
           const value = mutation.from + (mutation.to - mutation.from) * eased;
           const rainbow = context.createLinearGradient(point.x - boxWidth / 2, point.y - 5, point.x + boxWidth / 2, point.y + 5);
           for (let stop = 0; stop <= 4; stop++) {
-            rainbow.addColorStop(stop / 4, `hsl(${hue + stop * 75},100%,${76 + (1 - energy) * 20}%)`);
+            rainbow.addColorStop(stop / 4, `hsl(${hue + stop * 75},100%,${71 + (1 - energy) * 25}%)`);
           }
           context.fillStyle = rainbow;
           context.shadowColor = `hsla(${hue + 65},100%,70%,${energy})`;
-          context.shadowBlur = 12 * energy;
-          context.fillText(formatWeight(value), point.x, point.y - Math.sin(progress * Math.PI) * 2);
+          context.shadowBlur = 21 * energy;
+          context.font = `400 ${(fontSize * (1 + energy * 0.28)).toFixed(2)}px "IBM Plex Mono", monospace`;
+          context.fillText(formatWeight(value), point.x, point.y - Math.sin(progress * Math.PI) * 3);
           context.shadowBlur = 0;
 
           // A fine spectral ripple marks the moment the new weight takes hold.
           if (age > 0.65 && age < 1.65) {
             const ripple = (age - 0.65) / 1;
-            context.strokeStyle = `hsla(${hue + 150},100%,76%,${(1 - ripple) * 0.38})`;
+            context.strokeStyle = `hsla(${hue + 150},100%,76%,${(1 - ripple) * 0.6})`;
             context.lineWidth = 0.7;
             context.beginPath();
             context.ellipse(point.x, point.y, fontSize * (1.8 + ripple * 2), fontSize * (0.8 + ripple * 1.5), -0.3, 0, TAU);
