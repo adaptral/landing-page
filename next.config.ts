@@ -4,15 +4,16 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
-  // www is attached to the Vercel project only so it can land here
-  redirects: async () => [
-    {
-      source: "/:path*",
-      has: [{ type: "host", value: "www.adaptral.com" }],
-      destination: "https://adaptral.com/:path*",
-      permanent: true,
-    },
-  ],
+  // These hosts are attached to the Vercel project only so they can land on the primary domain.
+  redirects: async () =>
+    ["www.adaptral.com", "adaptral.co", "www.adaptral.co", "tryadaptral.com", "www.tryadaptral.com"].map(
+      (host) => ({
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        destination: "https://adaptral.com/:path*",
+        permanent: true,
+      }),
+    ),
 };
 
 export default nextConfig;
