@@ -1,0 +1,423 @@
+:root {
+  --paper: #f7f6f1;
+  --ink: #0a0a0a;
+  --muted: #605d55;
+  --rule: #d9d6cb;
+  --link: #1f35e0;
+  --link-wash: #1f35e014;
+  --sans: var(--font-sans), "Avenir Next", "Helvetica Neue", sans-serif;
+  --serif: var(--font-serif), "STIX Two Text", "Times New Roman", serif;
+  --math: var(--font-serif), "STIX Two Math", "Cambria Math", serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0b0b0c;
+    --ink: #f2f0ea;
+    --muted: #9c998f;
+    --rule: #2b2b2e;
+    --link: #97a5ff;
+    --link-wash: #97a5ff1f;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font: 400 1.1875rem/1.6 var(--serif);
+  font-feature-settings: "kern", "liga", "onum";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.page {
+  position: relative;
+  max-width: 43rem;
+  margin: 0 auto;
+  padding: 2.25rem 1.5rem 3rem;
+}
+
+/* the integral, very large and very quiet, on screens with room for it */
+.watermark {
+  display: none;
+}
+
+@media (min-width: 72rem) {
+  .watermark {
+    display: block;
+    position: fixed;
+    right: -9vw;
+    top: 50%;
+    height: 118vh;
+    transform: translateY(-50%);
+    opacity: 0.035;
+    pointer-events: none;
+  }
+}
+
+/* ---------- header ---------- */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5.5rem;
+}
+
+.brand {
+  display: block;
+  color: inherit;
+  line-height: 0;
+}
+
+.brand svg {
+  height: 3.4rem;
+  width: auto;
+}
+
+.top-link {
+  font: 600 0.8125rem/1 var(--sans);
+  letter-spacing: 0.01em;
+  color: inherit;
+  text-decoration: none;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--ink);
+}
+
+.top-link span,
+.button span {
+  display: inline-block;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.top-link:hover span,
+.button:hover span {
+  transform: translateX(4px);
+}
+
+/* ---------- type ---------- */
+h1 {
+  font: 700 clamp(2.1rem, 6.4vw, 3.3rem) / 1.06 var(--sans);
+  letter-spacing: -0.035em;
+  margin: 0 0 2.75rem;
+  text-wrap: balance;
+}
+
+h1 .dash {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+h2 {
+  font: 600 0.75rem/1 var(--sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 4.25rem 0 1.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--rule);
+}
+
+h3 {
+  font: 600 1.0625rem/1.3 var(--sans);
+  letter-spacing: -0.012em;
+  margin: 0 0 0.3rem;
+}
+
+p {
+  margin: 0 0 1.15rem;
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  border-radius: 2px;
+  transition: background-color 0.15s;
+}
+
+a:hover {
+  background: var(--link-wash);
+}
+
+:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+}
+
+/* ---------- definition ---------- */
+.definition {
+  margin-bottom: 1.6rem;
+  padding-left: 1.15rem;
+  border-left: 2px solid var(--ink);
+}
+
+.headword {
+  margin-bottom: 0.2rem;
+}
+
+.headword b {
+  font-weight: 700;
+}
+
+.headword i,
+.ipa {
+  color: var(--muted);
+}
+
+.definition p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- equation (1) ---------- */
+.equation {
+  margin: 3.25rem 0 0;
+}
+
+.math {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42em;
+  padding: 0.6rem 2.4rem 0.6rem 0;
+  font: 400 clamp(1.3rem, 4.6vw, 1.95rem) / 1 var(--math);
+  white-space: nowrap;
+}
+
+.math sub,
+.math sup {
+  font-size: 0.6em;
+  line-height: 0;
+}
+
+.math .tight {
+  margin-right: 0.12em;
+}
+
+.math .op {
+  padding: 0 0.1em;
+}
+
+.integral {
+  position: relative;
+  display: inline-block;
+  padding-right: 0.72em;
+  margin-left: 0.05em;
+  line-height: 0;
+}
+
+.integral svg {
+  height: 2.55em;
+  width: auto;
+}
+
+.integral sup,
+.integral sub {
+  position: absolute;
+  font-size: 0.56em;
+  line-height: 1;
+}
+
+.integral sup {
+  top: -0.25em;
+  right: 0.25em;
+}
+
+.integral sub {
+  bottom: -0.1em;
+  right: 1.75em;
+}
+
+.eq-no {
+  position: absolute;
+  right: 0;
+  font-size: 0.62em;
+  color: var(--muted);
+}
+
+figcaption {
+  margin-top: 1.5rem;
+  font-size: 0.94em;
+  color: var(--muted);
+  text-align: center;
+  text-wrap: balance;
+}
+
+figcaption sub {
+  font-size: 0.7em;
+  line-height: 0;
+}
+
+/* ---------- what we build ---------- */
+.work {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: work;
+}
+
+.work li {
+  position: relative;
+  padding-left: 3.1rem;
+  counter-increment: work;
+}
+
+.work li + li {
+  margin-top: 1.55rem;
+}
+
+.work li::before {
+  content: "1." counter(work);
+  position: absolute;
+  left: 0;
+  top: 0.24rem;
+  font: 500 0.8125rem/1.3 var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.work p {
+  margin: 0;
+}
+
+/* ---------- call to action ---------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding: 1rem 1.6rem;
+  font: 600 0.9375rem/1 var(--sans);
+  letter-spacing: -0.005em;
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: 999px;
+  text-decoration: none;
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.2s;
+}
+
+.button:hover {
+  background: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px -14px var(--ink);
+}
+
+.button:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.links li + li {
+  margin-top: 0.25rem;
+}
+
+.links span {
+  color: var(--muted);
+  font-size: 0.94em;
+}
+
+/* ---------- footer ---------- */
+footer {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 5rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+footer svg {
+  height: 1.7rem;
+  width: auto;
+  color: var(--ink);
+}
+
+footer p {
+  margin: 0;
+  font: 500 0.8125rem/1.4 var(--sans);
+}
+
+/* ---------- one orchestrated entrance ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .top,
+  main > * {
+    animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  main > :nth-child(1) { animation-delay: 0.06s; }
+  main > :nth-child(2) { animation-delay: 0.14s; }
+  main > :nth-child(3) { animation-delay: 0.2s; }
+  main > :nth-child(4) { animation-delay: 0.28s; }
+  main > :nth-child(n + 5) { animation-delay: 0.36s; }
+
+  .watermark {
+    animation: settle 1.6s ease-out both;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 30rem) {
+  body {
+    font-size: 1.0625rem;
+  }
+
+  .page {
+    padding: 1.5rem 1.25rem 2.5rem;
+  }
+
+  .top {
+    margin-bottom: 3.5rem;
+  }
+
+  .brand svg {
+    height: 2.9rem;
+  }
+
+  .math {
+    gap: 0.3em;
+    padding-right: 1.9rem;
+  }
+
+  .work li {
+    padding-left: 2.5rem;
+  }
+}
