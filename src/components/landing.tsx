@@ -2,16 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { caseStudies } from "./case-studies";
+import { DashboardDemo } from "./dashboard-demo";
 import { LossLandscape } from "./loss-landscape";
 import { NeuralNetwork, type NetworkMode } from "./neural-network";
+import { WorkflowSplit } from "./workflow-split";
 
-// Paste the Calendly link here; until then the button is deliberately inert.
-const BOOK_CALL_URL = "";
-
-function BookCall({ className }: { className: string }) {
-  return BOOK_CALL_URL
-    ? <a className={className} href={BOOK_CALL_URL} target="_blank" rel="noreferrer">Book a call</a>
-    : <button className={className} type="button">Book a call</button>;
+// Without a link the button stays in place but inert.
+function BookCall({ className, href }: { className: string; href: string }) {
+  return href
+    ? <a className={className} href={href} target="_blank" rel="noopener noreferrer">Talk to founders</a>
+    : <button className={className} type="button">Talk to founders</button>;
 }
 
 function StudyImage({ image, company }: { image?: string; company: string }) {
@@ -19,7 +19,7 @@ function StudyImage({ image, company }: { image?: string; company: string }) {
   return image ? <img src={image} alt={`${company} logo`} /> : <span>Company image</span>;
 }
 
-export function Landing() {
+export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
   const [mode, setMode] = useState<NetworkMode>("home");
   const [active, setActive] = useState<number | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -71,7 +71,8 @@ export function Landing() {
   }, [inside, active, leave]);
 
   return (
-    <main className="landing" data-mode={mode}>
+    <main>
+    <div className="landing" data-mode={mode}>
       <LossLandscape />
       <div className="wordmark" aria-label="Adaptral">
         <svg className="brand-symbol" viewBox="0 0 36 46" fill="none" aria-hidden="true">
@@ -94,7 +95,7 @@ export function Landing() {
           </h1>
           <p>Better with every iteration.<br />An advantage that compounds over time.</p>
           <div className="actions">
-            <BookCall className="cta cta-primary" />
+            <BookCall className="cta cta-primary" href={calendlyUrl} />
             <button ref={openerRef} className="cta cta-secondary" type="button" onClick={() => setMode("studies")}>
               See our work <span className="cta-arrow" aria-hidden="true">→</span>
             </button>
@@ -153,11 +154,19 @@ export function Landing() {
                   <p>{part.body}</p>
                 </section>
               ))}
-              <BookCall className="cta cta-primary" />
+              <BookCall className="cta cta-primary" href={calendlyUrl} />
             </article>
           </div>
         )}
       </section>
+    </div>
+    <WorkflowSplit />
+    <DashboardDemo />
+    <section className="closing" aria-labelledby="closing-title">
+      <h2 id="closing-title">A custom solution<br />for your work.</h2>
+      <p>Every app spends differently. Tell us what yours does and we’ll audit it with you and scope the models worth building.</p>
+      <BookCall className="cta cta-primary" href={calendlyUrl} />
+    </section>
     </main>
   );
 }
