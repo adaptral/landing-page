@@ -51,6 +51,44 @@ body {
 
 .brand-symbol { width: 25px; height: 34px; }
 
+/* Header links, level with the wordmark. Two scroll to a section; "Our partners" opens the network. */
+html { scroll-behavior: smooth; }
+.site-nav {
+  position: absolute;
+  top: clamp(30px, 4.6vw, 64px);
+  right: clamp(28px, 6.25vw, 112px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 38px);
+  height: 34px;
+  transition: opacity 0.4s ease;
+}
+.site-nav a, .site-nav button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #c9d1e0;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 520;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.site-nav a:hover, .site-nav button:hover { color: #fff; }
+.site-nav a:focus-visible, .site-nav button:focus-visible { outline: 1px solid #dbe7ff; outline-offset: 6px; border-radius: 3px; }
+.landing[data-mode="studies"] .site-nav { opacity: 0; pointer-events: none; }
+#how-it-works, #pricing { scroll-margin-top: 12px; }
+@media (max-width: 1000px) and (min-width: 701px) { .site-nav { right: 5vw; } }
+@media (max-width: 700px) {
+  .site-nav { top: 28px; right: 20px; gap: 14px; height: 30px; }
+  .site-nav a, .site-nav button { font-size: 12.5px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .site-nav { transition: none; } }
+
 .composition {
   display: grid;
   grid-template-columns: 44% 56%;
@@ -285,6 +323,16 @@ h1 > .headline-glow {
 }
 .study-image { height: clamp(60px, 11vh, 108px); margin-bottom: 7px; }
 .study-image img, .study-detail-image img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Logos sit whole inside the frame instead of being cropped to fill it. */
+.study-image img[src$=".svg"], .study-detail-image img[src$=".svg"] { width: auto; height: auto; max-width: 82%; max-height: 64%; object-fit: contain; }
+.study-detail-image img[src$=".svg"] { max-width: 60%; max-height: 46%; }
+/* Behind a logo the frame is plain, so the mark reads cleanly. */
+.study-image:has(img[src$=".svg"]), .study-detail-image:has(img[src$=".svg"]) { background: #0b0e15; }
+.studies-grid[data-few] { grid-template-rows: auto; }
+.study-site { display: inline-block; margin-top: 6px; color: #b9c6ff; font-size: 14px; text-underline-offset: 3px; }
+.study-site:hover { color: #fff; }
+.dashboard.billing { padding-bottom: clamp(24px, 5vh, 64px); }
 
 .study-sector {
   margin: 0;

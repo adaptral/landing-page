@@ -1,33 +1,56 @@
 export type CaseStudy = {
   id: string;
   company: string;
+  // The partner's website, linked from the open case study.
+  url?: string;
   sector: string;
   // One line shown on the card inside the network.
   brief: string;
-  // Path under /public, e.g. "/studies/acme.png". Leave undefined to show the placeholder.
+  // Path under /public, e.g. "/logos/acme.svg". Leave undefined to show the placeholder.
   image?: string;
   metrics: { value: string; label: string }[];
   story: { heading: string; body: string }[];
 };
 
-// Placeholder content: replace each entry with a real partner. Cards are wired
-// two per layer, in order, so keep the count even.
-export const caseStudies: CaseStudy[] = Array.from({ length: 6 }, (_, index) => {
-  const number = String(index + 1).padStart(2, "0");
-  return {
-    id: `partner-${number}`,
-    company: `Partner ${number}`,
-    sector: "Industry · Use case",
-    brief: "One line on the task we trained a model for, and what changed for them.",
+// Our partners. With one or two entries each card is its own layer; from three up,
+// cards are wired two per layer, in order, so keep that count even.
+// The cost and speed figures are estimates from public price lists, not measured results,
+// and each label says so.
+export const caseStudies: CaseStudy[] = [
+  {
+    id: "prorated",
+    company: "Prorated",
+    url: "https://prorated.io/",
+    sector: "Hiring · CRM automation",
+    brief: "An AI assistant runs their recruiting CRM. We moved it from a frontier model to a small one of their own.",
+    image: "/logos/prorated-white.svg",
     metrics: [
-      { value: "00%", label: "Headline metric" },
-      { value: "00×", label: "Second metric" },
-      { value: "00ms", label: "Third metric" },
+      { value: "65–85%", label: "Lower running cost (estimate)" },
+      { value: "2×", label: "Faster per task (estimate)" },
+      { value: "Private", label: "Candidate data stays inside" },
     ],
     story: [
-      { heading: "The problem", body: "Placeholder. What the partner was trying to do, and why an off-the-shelf model was not good enough." },
-      { heading: "What we trained", body: "Placeholder. The data we started from, the model we shaped around their task, and how we evaluated it." },
-      { heading: "The result", body: "Placeholder. What improved, how it was measured, and what the partner did next." },
+      { heading: "The problem", body: "Prorated builds hiring software that finds engineers and tests them on real work. An AI assistant operates its recruiting CRM: it moves candidates between stages, updates records, sends follow-ups and books interviews. Every one of those steps went through a frontier model, so the bill rose with each task and candidate data left their systems." },
+      { heading: "What we trained", body: "A small model fine-tuned on those same screens and tasks, evaluated side by side with the frontier model before any traffic moved." },
+      { heading: "The result", body: "The same work at a fraction of the running cost, with faster replies on every step and candidate records kept on their own machines." },
     ],
-  };
-});
+  },
+  {
+    id: "bayvis",
+    company: "Bayvis",
+    url: "https://bayvis.co/",
+    sector: "Collision repair · Estimate checking",
+    brief: "AI estimating for car repair shops. We trained a small model to check every line of an estimate.",
+    image: "/logos/bayvis-white.svg",
+    metrics: [
+      { value: "Fixed", label: "Cost, not a fee per estimate" },
+      { value: "2×", label: "Faster drafts (estimate)" },
+      { value: "Private", label: "Customer photos stay inside" },
+    ],
+    story: [
+      { heading: "The problem", body: "Bayvis builds estimating software for collision repair shops. From photos of the damage it writes the full repair estimate, with a published source behind every line. Checking each line on a frontier model meant a fee on every estimate, and customers' photos sent to an outside provider." },
+      { heading: "What we trained", body: "A small model fine-tuned to check estimate lines against the estimating guides and the car makers' repair procedures." },
+      { heading: "The result", body: "Line checks at a cost that no longer grows with each estimate, drafts ready sooner, and shop data kept in-house." },
+    ],
+  },
+];

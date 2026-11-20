@@ -254,7 +254,7 @@ export function DashboardDemo() {
   }, []);
 
   return (
-    <section className="dashboard" aria-labelledby="dashboard-title">
+    <section id="how-it-works" className="dashboard" aria-labelledby="dashboard-title">
       <p className="workflow-eyebrow">The dashboard</p>
       <h2 id="dashboard-title">Our agents recommend.<br />You decide.</h2>
       <p className="workflow-lede">Every swap shows up with what it costs today and what could replace it. You choose when to generate data, fine-tune and move traffic.</p>

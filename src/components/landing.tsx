@@ -19,6 +19,9 @@ function StudyImage({ image, company }: { image?: string; company: string }) {
   return image ? <img src={image} alt={`${company} logo`} /> : <span>Company image</span>;
 }
 
+// With only one or two partners each card is its own layer, so they still wire together.
+const PER_LAYER = caseStudies.length <= 2 ? 1 : 2;
+
 export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
   const [mode, setMode] = useState<NetworkMode>("home");
   const [active, setActive] = useState<number | null>(null);
@@ -80,6 +83,12 @@ export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
         </svg>
         <span>Adaptral</span>
       </div>
+      {/* "How it works" and "Pricing" scroll to their sections; "Our partners" opens the network view. */}
+      <nav className="site-nav" aria-label="Sections" inert={inside}>
+        <a href="#how-it-works">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <button type="button" onClick={() => setMode("studies")}>Our partners</button>
+      </nav>
 
       <div className="composition">
         <div className="introduction" inert={inside}>
@@ -97,22 +106,22 @@ export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
           <div className="actions">
             <BookCall className="cta cta-primary" href={calendlyUrl} />
             <button ref={openerRef} className="cta cta-secondary" type="button" onClick={() => setMode("studies")}>
-              See our work <span className="cta-arrow" aria-hidden="true">→</span>
+              Our partners <span className="cta-arrow" aria-hidden="true">→</span>
             </button>
           </div>
         </div>
         <NeuralNetwork mode={mode} gridRef={gridRef} />
       </div>
 
-      <section className="studies" aria-label="Case studies" inert={!inside}>
+      <section className="studies" aria-label="Our partners" inert={!inside}>
         <div className="studies-chrome" inert={study !== null}>
           <button ref={backRef} className="studies-back" type="button" onClick={leave}>
             <span aria-hidden="true">←</span> Back
           </button>
-          <p className="studies-hint">Our work · select a node to open its case study</p>
+          <p className="studies-hint">Our partners · select a node to open its case study</p>
         </div>
 
-        <div ref={gridRef} className="studies-grid" inert={study !== null}>
+        <div ref={gridRef} className="studies-grid" data-few={PER_LAYER === 1 ? "" : undefined} inert={study !== null}>
           {caseStudies.map((item, index) => (
             <button
               key={item.id}
@@ -120,7 +129,7 @@ export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
               className="study"
               type="button"
               data-study=""
-              data-layer={Math.floor(index / 2)}
+              data-layer={Math.floor(index / PER_LAYER)}
               onClick={() => setActive(index)}
             >
               <span className="study-image"><StudyImage image={item.image} company={item.company} /></span>
@@ -139,6 +148,7 @@ export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
               <div className="study-detail-image"><StudyImage image={study.image} company={study.company} /></div>
               <p className="study-sector">{study.sector}</p>
               <h2 id="study-title">{study.company}</h2>
+              {study.url && <a className="study-site" href={study.url} target="_blank" rel="noopener noreferrer">{study.url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a>}
               <p className="study-lead">{study.brief}</p>
               <dl className="study-metrics">
                 {study.metrics.map((metric) => (
@@ -162,6 +172,11 @@ export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
     </div>
     <WorkflowSplit />
     <DashboardDemo />
+    <section id="pricing" className="dashboard billing" aria-labelledby="billing-title">
+      <p className="workflow-eyebrow">Pricing</p>
+      <h2 id="billing-title">You pay per token.<br />We run the GPUs.</h2>
+      <p className="workflow-lede">Your fine-tuned models are served from our infrastructure and billed per token, the way you pay for a frontier model today. There are no GPUs for you to rent, size or keep busy.</p>
+    </section>
     <section className="closing" aria-labelledby="closing-title">
       <h2 id="closing-title">A custom solution<br />for your work.</h2>
       <p>Every app spends differently. Tell us what yours does and we’ll audit it with you and scope the models worth building.</p>
