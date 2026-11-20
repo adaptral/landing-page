@@ -91,6 +91,7 @@ const ICONS: Record<string, ReactNode> = {
   bill: <><path d="M11 5h26v38l-4.5-3-4.5 3-4-3-4.5 3-4-3-4.5 3z" /><path d="M18 14h12M18 21h12M18 28h7" /></>,
   flag: <><rect x="8" y="6" width="32" height="36" rx="3" /><path d="M14 16l3 3 5-6M14 30l3 3 5-6" /><path d="M27 17h8M27 31h8" /></>,
   car: <><path d="M5 30v-7l5-2 4-9h18l5 9 6 2v7z" /><path d="M12 21h24" /><circle cx="14" cy="32" r="4" /><circle cx="34" cy="32" r="4" /></>,
+  cart: <><path d="M5 9h6l5 21h21l4-14H14" /><circle cx="19" cy="38" r="3" /><circle cx="34" cy="38" r="3" /></>,
   people: <><circle cx="16" cy="15" r="6" /><circle cx="33" cy="17" r="5" /><path d="M5 40c0-8 5-13 11-13s11 5 11 13M30 28c7-1 13 3 13 12" /></>,
   search: <><circle cx="21" cy="21" r="12" /><path d="M30 30l12 12" /></>,
   train: <><path d="M6 38l10-12 8 6 10-16 8 8" /><path d="M6 8v34h36" /></>,

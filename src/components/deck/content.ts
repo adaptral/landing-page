@@ -35,8 +35,7 @@ export type DeckCase = {
   id: string;
   // "Case study" for delivered work. "Example" for work shown as an illustration.
   kind: "Case study" | "Example";
-  // The customer's name, shown as the slide's heading. Prorated and Bayvis are real;
-  // LexLine, Cargobook and Kartwise are PLACEHOLDERS to replace.
+  // The customer's name, shown as the slide's heading. All three are real companies.
   company: string;
   // Their website and logo (a file under /public/logos). Leave out for a placeholder.
   url?: string;
@@ -80,61 +79,9 @@ export const crmCase: DeckCase = {
   elsewhere: `At ${TASKS_PER_MONTH.toLocaleString("en-IN")} tasks a month. The same idea works for any software your staff click through all day.`,
 };
 
-// The cost figures below assume these monthly volumes, a large model at $2 and $10 per
-// million tokens, and one rented GPU machine ($588 a month) for the small model:
-// 300,000 calls, 200,000 pages, 600,000 messages. Replace them with the real ones.
+// The other case studies. Every company here is real; nothing in this list is invented.
+// Neither has a cost percentage, because there is no volume to base one on yet.
 export const deckCases: DeckCase[] = [
-  {
-    id: "legal-calls",
-    kind: "Case study",
-    company: "LexLine",
-    about: "LexLine builds AI phone agents that answer the first call for law firms. Calls are confidential, so they wanted notes written fast, with nothing leaving their servers.",
-    built: "AI phone agents for law firms. We trained a small model that writes the call notes and client form on their own servers, so no client conversation leaves the building.",
-    does: "After each call, the notes and the client form are written automatically.",
-    icons: ["phone", "notes"],
-    before: { logos: "models", figure: "Paid for every call", points: ["Bill grew with every call", "Client calls sent outside", "Notes arrived late"] },
-    after: { figure: "One fixed monthly cost", points: ["Same cost, busy or quiet", "Calls stay on their servers", "Notes ready as the call ends"] },
-    results: [
-      { value: "About 70%", label: "lower running cost" },
-      { value: SPEED, label: "notes ready sooner" },
-      privateResult("Client calls"),
-    ],
-    elsewhere: "The same job: any desk that takes calls. Customer care, helplines, branch phones.",
-  },
-  {
-    id: "freight-paperwork",
-    kind: "Case study",
-    company: "Cargobook",
-    about: "Cargobook moves freight for manufacturers and traders, and receives thousands of scanned invoices a day. They wanted each one read in seconds, without a fee per page.",
-    built: "A freight company buried in scanned invoices. We trained a small model that reads Indian invoices and e-way bills in seconds, at a fixed monthly cost, on their own machines.",
-    does: "Each paper is read and entered into the system, with no typing.",
-    icons: ["papers", "table"],
-    before: { logos: "models", figure: "Paid for every page", points: ["Bill grew with every page", "Invoices sent outside", "A queue at busy hours"] },
-    after: { figure: "One fixed monthly cost", points: ["Same cost at any volume", "Invoices stay inside", "Read in seconds"] },
-    results: [
-      { value: "About 65%", label: "lower running cost" },
-      { value: SPEED, label: "per page" },
-      privateResult("Prices and customers"),
-    ],
-    elsewhere: "The same job: supplier invoices, purchase orders, cargo and customs papers.",
-  },
-  {
-    id: "support-sorting",
-    kind: "Case study",
-    company: "Kartwise",
-    about: "Kartwise sells online and gets tens of thousands of customer messages a day, in Hindi and English. They wanted each one sorted in seconds, at a cost that does not climb with sales.",
-    built: "An online retailer with tens of thousands of messages a day. We trained a small model that sorts each one and drafts the reply, in Hindi and English, without customer details leaving.",
-    does: "Each message is sent to the right team, with a reply already drafted.",
-    icons: ["chat", "trays"],
-    before: { logos: "models", figure: "Paid for every message", points: ["Cost climbed with sales", "Customer details sent out", "Slow in festival season"] },
-    after: { figure: "One fixed monthly cost", points: ["Same cost in peak season", "Details stay inside", "Sorted in seconds"] },
-    results: [
-      { value: "About 60%", label: "lower running cost" },
-      { value: SPEED, label: "replies go out sooner" },
-      privateResult("Customer details"),
-    ],
-    elsewhere: "The same job: complaints desks, service counters, internal IT helpdesks.",
-  },
   {
     // Bayvis (bayvis.co) makes estimating software for collision repair shops. No cost
     // percentage here: there is no volume to base one on yet.
@@ -155,6 +102,28 @@ export const deckCases: DeckCase[] = [
       privateResult("Customer photos"),
     ],
     elsewhere: "The same job: any document checked against a rule book. Insurance claims, contractor bills, audits.",
+  },
+  {
+    // SquareUp (joinsquareup.com) builds AI-run online stores for consumer brands: an AI
+    // seller that recommends, bundles, negotiates within a floor price and closes the sale,
+    // on web chat, WhatsApp and voice.
+    id: "ai-salesperson",
+    kind: "Case study",
+    company: "SquareUp",
+    url: "https://joinsquareup.com/",
+    logo: "/logos/squareup.svg",
+    about: "SquareUp builds online stores with an AI salesperson that talks to every shopper and closes the sale, on chat, WhatsApp and voice. They wanted each conversation faster and cheaper.",
+    built: "Online stores with an AI salesperson for every shopper. We trained a small model that answers product questions and recommends what to buy, fast enough to keep the shopper, at a fixed cost.",
+    does: "Every shopper gets a salesperson who answers, recommends and closes.",
+    icons: ["chat", "cart"],
+    before: { logos: "models", figure: "Paid for every conversation", points: ["A fee on each shopper chat", "Shopper chats sent outside", "Slow replies lose the sale"] },
+    after: { figure: "One fixed monthly cost", points: ["Same cost in peak season", "Chats stay inside", "Answers while they browse"] },
+    results: [
+      { value: "Fixed cost", label: "not a fee per conversation" },
+      { value: SPEED, label: "replies while the shopper waits" },
+      privateResult("Shopper conversations"),
+    ],
+    elsewhere: "The same job: any business that sells or serves by chat. Bank helpdesks, ticket counters, dealer enquiries.",
   },
 ];
 
@@ -235,8 +204,7 @@ export const versusRows = [
 ];
 
 // The founders. Edit freely: only the lines below were confirmed from public profiles.
-// For a photo, save a square picture at the `photo` path under /public; until then the
-// slide shows initials.
+// Photos are the square pictures at each `photo` path under /public; initials show if one is missing.
 export const founders = [
   {
     name: "Divyanshu Shekhar",

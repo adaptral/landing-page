@@ -1,9 +1,10 @@
 # Founder photos
 
-The founders slide of the pitch deck (`/deck`) looks here for a square photo of each
-founder and shows initials until the file exists:
+The founders slide of the pitch deck (`/deck`) shows these two square photos, and falls
+back to initials if a file is missing:
 
 - `divyanshu.jpg`
 - `abhinav.jpg`
 
-The paths are set in `src/components/deck/content.ts`.
+To change one, replace the file with another square picture of the same name. The paths
+are set in `src/components/deck/content.ts`.

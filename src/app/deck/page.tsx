@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Deck } from "@/components/deck/deck";
 import "./deck.css";
 
-// The pitch deck. SWITCHED OFF: this folder is named `_deck`, and Next.js gives folders that
-// start with an underscore no URL. Rename it back to `deck` to bring /deck back.
-// When live it is shared by link, so search engines are asked to skip it.
+// The pitch deck, at /deck. Back on temporarily. To switch it off again without deleting
+// anything, rename this folder to `_deck`: Next.js gives folders that start with an underscore no URL.
+// It is shared by link, so search engines are asked to skip it.
 export const metadata: Metadata = {
   title: "Adaptral | Pitch deck",
   description: "Small AI models trained for one job in your business, on your own servers, at a fixed cost.",

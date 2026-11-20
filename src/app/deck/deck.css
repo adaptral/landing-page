@@ -414,6 +414,19 @@ body:has(.deck) { background: #fff; }
 .deck-table td:nth-child(2) strong::before { content: "✕  "; }
 .deck-table td:nth-child(3) strong::before { content: "✓  "; }
 
+/* With real photos the founders' pictures are larger. */
+.deck-avatar { width: calc(var(--u) * 132); height: calc(var(--u) * 132); }
+.deck-slide .deck-team ul { margin-top: calc(var(--u) * 24); }
+.deck-team > li > a { margin-top: calc(var(--u) * 20); }
+
+/* Model names under their logos on the "senior partner" slide. */
+.deck-orb-named > span { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 5); font-size: calc(var(--u) * 15.5); font-weight: 650; letter-spacing: -0.02em; }
+.deck-named { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 5); font-size: calc(var(--u) * 15.5); font-weight: 650; letter-spacing: -0.02em; }
+.deck-versus-side .deck-orb-cluster { height: auto; column-gap: calc(var(--u) * 26); }
+.deck-versus-side .deck-named .deck-orb { width: calc(var(--u) * 72); height: calc(var(--u) * 72); }
+.deck-versus-side .deck-named .deck-orb :is(svg, img) { width: calc(var(--u) * 36); height: calc(var(--u) * 36); }
+.deck-versus-side .deck-orb-named { width: calc(var(--u) * 206); height: calc(var(--u) * 206); gap: calc(var(--u) * 18); }
+
 /* Footer: brand, progress, slide number, previous and next. */
 .deck-footer {
   --u: calc(100cqw / 1280);

@@ -121,7 +121,7 @@ export function buildSlides(calendlyUrl: string): Slide[] {
           <h2>You would not hire a senior partner to do data entry.</h2>
           <div className="deck-versus">
             <div className="deck-versus-side">
-              <span className="deck-orb deck-orb-big"><ClaudeLogo /><ChatGptLogo /></span>
+              <span className="deck-orb deck-orb-big deck-orb-named"><span><ClaudeLogo />Claude</span><span><ChatGptLogo />ChatGPT</span></span>
               <h3>One giant model, rented</h3>
               <ul>
                 <li>Costly: you pay for every use</li>
@@ -133,10 +133,10 @@ export function buildSlides(calendlyUrl: string): Slide[] {
             <div className="deck-versus-side deck-versus-ours">
               <span className="deck-orb-cluster">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <span className="deck-orb"><img src="/models/qwen.svg" alt="" /></span>
+                <span className="deck-named"><span className="deck-orb"><img src="/models/qwen.svg" alt="" /></span>Qwen</span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <span className="deck-orb"><img src="/models/gemma.svg" alt="" /></span>
-                <span className="deck-orb"><Mark /></span>
+                <span className="deck-named"><span className="deck-orb"><img src="/models/gemma.svg" alt="" /></span>Gemma</span>
+                <span className="deck-named"><span className="deck-orb"><Mark /></span>Your own model</span>
               </span>
               <h3>Small models, yours</h3>
               <ul>

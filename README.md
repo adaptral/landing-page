@@ -17,8 +17,8 @@ All animations respect the system's reduced-motion preference; canvases pause of
 
 The Entrepreneurs First backing badge uses the user-provided artwork, stored locally in `public/ef-backing.png`.
 
-## Pitch deck (switched off)
+## Pitch deck (`/deck`)
 
-The deck has no URL at the moment: its route folder is named `src/app/_deck`, and Next.js ignores folders that start with an underscore. Rename it to `src/app/deck` to bring `/deck` back. Its styles are in `src/app/_deck/deck.css` until then.
+The deck is live at `/deck` for now. To switch it off without deleting anything, rename `src/app/deck` to `src/app/_deck`: Next.js ignores folders that start with an underscore.
 
-A 16-slide deck for enterprise meetings, light-themed for projectors, built from pictures more than text (`art.tsx` holds the logos, icons and illustrations). Arrow keys, space or a clicker move between slides, `F` goes full screen, and printing gives one slide per page. The text you are likely to change (the CRM's placeholder name, the cost example's inputs, the five case studies (Prorated and Bayvis are real names, the other three are placeholders) and cost and speed figures, the list of agent uses, the build-it-yourself table and the founders) is in `src/components/deck/content.ts`; the rest of the slides are in `slides.tsx`, and the styles in `src/app/deck/deck.css`. The cost and speed figures are estimates from public price lists, and each slide says so.
+A 14-slide deck for enterprise meetings, light-themed for projectors, built from pictures more than text (`art.tsx` holds the logos, icons and illustrations). Arrow keys, space or a clicker move between slides, `F` goes full screen, and printing gives one slide per page. The text you are likely to change (the CRM's placeholder name, the cost example's inputs, the three case studies (Prorated, Bayvis and SquareUp, all real companies) and cost and speed figures, the list of agent uses, the build-it-yourself table and the founders) is in `src/components/deck/content.ts`; the rest of the slides are in `slides.tsx`, and the styles in `src/app/deck/deck.css`. The cost and speed figures are estimates from public price lists, and each slide says so.
