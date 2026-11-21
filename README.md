@@ -1,24 +1,65 @@
 # Adaptral
 
-A minimal Next.js landing page with a real-time, perspective-projected neural network whose weights visibly update.
+The landing page for [adaptral.com](https://www.adaptral.com): small models, fine-tuned for your workflows.
+
+Next.js, built as a static site. The hero is a live 3D neural network whose weights update in real time over an animated loss landscape.
+
+## Quick start
 
 ```sh
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-`npm run build` creates a static production export in `out/`. `npm run typecheck` checks TypeScript.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Local dev server |
+| `npm run build` | Static export to `out/` |
+| `npm run typecheck` | TypeScript check |
 
-The foreground projects a small fully connected network in three dimensions (4-6-6-3 neurons on desktop, 3-5-5-2 on mobile) that sways gently. Connection thickness follows weight magnitude, a spread-out subset of connections print their weight, and individual updates travel along a connection as a rainbow pulse while the number rolls to its new value. A second canvas draws the loss surface, fading it out before the network. Its moving dot carries a shared spectrum across the grid and headline, then fades into the input layer, setting off a layer-by-layer pass of weight updates. Both use one animation clock. The canvas for the network is pinned to the viewport (`.network-stage`); the `.matrix` box only marks where the network sits in the layout.
+## Deploying
 
-"Our partners" pulls the camera into the network: the outer network zooms past while a second network of case-study cards grows into place, joined by the same weighted, updating connections. The cards are real buttons laid out by CSS (`.studies-grid`); the canvas reads their positions and draws the wiring beneath them, and both ride one zoom transform. Selecting a card opens its case study. The two partners (Prorated and Bayvis) are in `src/components/case-studies.ts`; the "Book a call" link is `BOOK_CALL_URL` in `src/components/landing.tsx` and is empty for now.
+Every push to `main` deploys to production on Vercel (project `adaptral-landing-page`). Other branches get preview URLs.
 
-All animations respect the system's reduced-motion preference; canvases pause offscreen and in background tabs.
+The Vercel team is on the Hobby plan, which only connects public repositories. Keep this repo public, or upgrade Vercel to Pro before making it private.
 
-The Entrepreneurs First backing badge uses the user-provided artwork, stored locally in `public/ef-backing.png`.
+Vercel redirects `adaptral.com` to `www.adaptral.com` in its domain settings. The site is a static export, so redirects in `next.config.ts` do not work.
 
-## Pitch deck (`/deck`)
+## Environment variables
 
-The deck is live at `/deck` for now. To switch it off without deleting anything, rename `src/app/deck` to `src/app/_deck`: Next.js ignores folders that start with an underscore.
+Set these in Vercel > Project > Settings > Environment Variables. All are optional.
 
-A 14-slide deck for enterprise meetings, light-themed for projectors, built from pictures more than text (`art.tsx` holds the logos, icons and illustrations). Arrow keys, space or a clicker move between slides, `F` goes full screen, and printing gives one slide per page. The text you are likely to change (the CRM's placeholder name, the cost example's inputs, the three case studies (Prorated, Bayvis and SquareUp, all real companies) and cost and speed figures, the list of agent uses, the build-it-yourself table and the founders) is in `src/components/deck/content.ts`; the rest of the slides are in `slides.tsx`, and the styles in `src/app/deck/deck.css`. The cost and speed figures are estimates from public price lists, and each slide says so.
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `NEXT_CALENDLY_URL` | empty | Where "Book a call" goes. Empty or not a URL: the buttons do nothing. |
+| `NEXT_PUBLIC_SITE_URL` | Vercel production URL | Canonical origin for metadata, sitemap and robots.txt |
+| `NEXT_PUBLIC_GTM_ID` | `GTM-WL5XNF6H` | Google Tag Manager container. Set empty to turn off. |
+| `NEXT_PUBLIC_CLARITY_ID` | `zfi6gshmki` | Microsoft Clarity project. Set empty to turn off. |
+
+## Where to change things
+
+| To change | Edit |
+| --- | --- |
+| Page copy and sections | `src/components/landing.tsx` |
+| Title, description, site URL, analytics IDs | `src/app/site.ts` |
+| Case studies (Prorated, Bayvis) | `src/components/case-studies.ts` |
+| Models in "How it works" | `TASKS` in `src/components/workflow-scene.ts`, logos in `public/models/` |
+| Partner logos | `public/logos/` |
+| Colours, type, layout | `src/app/globals.css` |
+| Brand assets (logo, favicons, social images) | `logo/` (see `logo/README.md`) |
+
+## How the animation works
+
+- **Network** (`neural-network.tsx`): a fully connected network (4-6-6-3 on desktop, 3-5-5-2 on mobile) projected in 3D. Line thickness follows weight size. Updates travel along a connection as a rainbow pulse while its number rolls to the new value.
+- **Loss landscape** (`loss-landscape.tsx`): a second canvas behind it. Its moving dot carries a colour spectrum across the grid and headline, then fades into the input layer and starts a layer-by-layer pass of weight updates.
+- **Partners**: scrolling to "Our partners" zooms the camera into the network, and a second network of case-study cards grows into place. The cards are real buttons laid out by CSS (`.studies-grid`); the canvas reads their positions and draws the wiring beneath them.
+- Both canvases share one animation clock, pause offscreen and in background tabs, and respect the reduced-motion setting.
+
+## Project layout
+
+```
+src/app/          routes, layout, metadata, robots.txt, sitemap
+src/components/   landing page and canvas animations
+public/           images served as-is (logos, models, team, EF badge)
+logo/             brand kit: SVG/PNG logos, favicons, social images
+```
