@@ -88,6 +88,7 @@ export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
         <a href="#how-it-works">How it works</a>
         <a href="#pricing">Pricing</a>
         <button type="button" onClick={() => setMode("studies")}>Our partners</button>
+        <a className="site-nav-blog" href="/blog">Blog</a>
       </nav>
 
       <div className="composition">

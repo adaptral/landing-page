@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "@fontsource-variable/manrope";
 import "@fontsource/ibm-plex-mono/400.css";
+import "@/design/tokens.css";
 import "./globals.css";
 import { CLARITY_ID, GTM_ID, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site";
 
@@ -37,6 +38,7 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": `${SITE_URL}/#organization`,
   name: SITE_NAME,
   url: SITE_URL,
   logo: `${SITE_URL}/icon.svg`,
