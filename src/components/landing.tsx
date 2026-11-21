@@ -1,0 +1,187 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { caseStudies } from "./case-studies";
+import { DashboardDemo } from "./dashboard-demo";
+import { LossLandscape } from "./loss-landscape";
+import { NeuralNetwork, type NetworkMode } from "./neural-network";
+import { WorkflowSplit } from "./workflow-split";
+
+// Without a link the button stays in place but inert.
+function BookCall({ className, href }: { className: string; href: string }) {
+  return href
+    ? <a className={className} href={href} target="_blank" rel="noopener noreferrer">Talk to founders</a>
+    : <button className={className} type="button">Talk to founders</button>;
+}
+
+function StudyImage({ image, company }: { image?: string; company: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return image ? <img src={image} alt={`${company} logo`} /> : <span>Company image</span>;
+}
+
+// With only one or two partners each card is its own layer, so they still wire together.
+const PER_LAYER = caseStudies.length <= 2 ? 1 : 2;
+
+export function Landing({ calendlyUrl }: { calendlyUrl: string }) {
+  const [mode, setMode] = useState<NetworkMode>("home");
+  const [active, setActive] = useState<number | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLButtonElement>(null);
+  const backRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const visited = useRef(false);
+  const lastActive = useRef<number | null>(null);
+  const inside = mode === "studies";
+  const study = active === null ? null : caseStudies[active];
+
+  const leave = useCallback(() => {
+    setActive(null);
+    setMode("home");
+  }, []);
+
+  // Keep the page still while inside the network, and move focus with the view.
+  useEffect(() => {
+    document.documentElement.classList.toggle("in-studies", inside);
+    if (inside) {
+      visited.current = true;
+      backRef.current?.focus({ preventScroll: true });
+    } else if (visited.current) {
+      openerRef.current?.focus({ preventScroll: true });
+    }
+    return () => document.documentElement.classList.remove("in-studies");
+  }, [inside]);
+
+  useEffect(() => {
+    if (active !== null) {
+      lastActive.current = active;
+      closeRef.current?.focus({ preventScroll: true });
+    } else if (lastActive.current !== null && inside) {
+      cardRefs.current[lastActive.current]?.focus({ preventScroll: true });
+      lastActive.current = null;
+    }
+  }, [active, inside]);
+
+  useEffect(() => {
+    if (!inside) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (active !== null) setActive(null);
+      else leave();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [inside, active, leave]);
+
+  return (
+    <main>
+    <div className="landing" data-mode={mode}>
+      <LossLandscape />
+      <div className="wordmark" aria-label="Adaptral">
+        <svg className="brand-symbol" viewBox="0 0 36 46" fill="none" aria-hidden="true">
+          <path d="M29 6C15-3 20 49 6 39" stroke="currentColor" strokeWidth="6.5" strokeLinecap="round" />
+        </svg>
+        <span>Adaptral</span>
+      </div>
+      {/* "How it works" and "Pricing" scroll to their sections; "Our partners" opens the network view. */}
+      <nav className="site-nav" aria-label="Sections" inert={inside}>
+        <a href="#how-it-works">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <button type="button" onClick={() => setMode("studies")}>Our partners</button>
+      </nav>
+
+      <div className="composition">
+        <div className="introduction" inert={inside}>
+          <a className="backing" href="https://www.joinef.com/" target="_blank" rel="noreferrer">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/ef-backing.png" alt="Backed by Entrepreneurs First" width="480" height="86" />
+          </a>
+          <h1>
+            <span className="headline-glow" aria-hidden="true">Intelligence<br />shaped around<br />you.</span>
+            <span>Intelligence</span>
+            <span>shaped around</span>
+            <span>you.</span>
+          </h1>
+          <p>Better with every iteration.<br />An advantage that compounds over time.</p>
+          <div className="actions">
+            <BookCall className="cta cta-primary" href={calendlyUrl} />
+            <button ref={openerRef} className="cta cta-secondary" type="button" onClick={() => setMode("studies")}>
+              Our partners <span className="cta-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+        <NeuralNetwork mode={mode} gridRef={gridRef} />
+      </div>
+
+      <section className="studies" aria-label="Our partners" inert={!inside}>
+        <div className="studies-chrome" inert={study !== null}>
+          <button ref={backRef} className="studies-back" type="button" onClick={leave}>
+            <span aria-hidden="true">←</span> Back
+          </button>
+          <p className="studies-hint">Our partners · select a node to open its case study</p>
+        </div>
+
+        <div ref={gridRef} className="studies-grid" data-few={PER_LAYER === 1 ? "" : undefined} inert={study !== null}>
+          {caseStudies.map((item, index) => (
+            <button
+              key={item.id}
+              ref={(element) => { cardRefs.current[index] = element; }}
+              className="study"
+              type="button"
+              data-study=""
+              data-layer={Math.floor(index / PER_LAYER)}
+              onClick={() => setActive(index)}
+            >
+              <span className="study-image"><StudyImage image={item.image} company={item.company} /></span>
+              <span className="study-sector">{item.sector}</span>
+              <span className="study-company">{item.company}</span>
+              <span className="study-brief">{item.brief}</span>
+              <span className="study-more">Read case study <span aria-hidden="true">→</span></span>
+            </button>
+          ))}
+        </div>
+
+        {study && (
+          <div className="study-backdrop" onClick={() => setActive(null)}>
+            <article className="study-detail" role="dialog" aria-modal="true" aria-labelledby="study-title" onClick={(event) => event.stopPropagation()}>
+              <button ref={closeRef} className="study-close" type="button" aria-label="Close case study" onClick={() => setActive(null)}>×</button>
+              <div className="study-detail-image"><StudyImage image={study.image} company={study.company} /></div>
+              <p className="study-sector">{study.sector}</p>
+              <h2 id="study-title">{study.company}</h2>
+              {study.url && <a className="study-site" href={study.url} target="_blank" rel="noopener noreferrer">{study.url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a>}
+              <p className="study-lead">{study.brief}</p>
+              <dl className="study-metrics">
+                {study.metrics.map((metric) => (
+                  <div key={metric.label}>
+                    <dt>{metric.label}</dt>
+                    <dd>{metric.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              {study.story.map((part) => (
+                <section key={part.heading} className="study-part">
+                  <h3>{part.heading}</h3>
+                  <p>{part.body}</p>
+                </section>
+              ))}
+              <BookCall className="cta cta-primary" href={calendlyUrl} />
+            </article>
+          </div>
+        )}
+      </section>
+    </div>
+    <WorkflowSplit />
+    <DashboardDemo />
+    <section id="pricing" className="dashboard billing" aria-labelledby="billing-title">
+      <p className="workflow-eyebrow">Pricing</p>
+      <h2 id="billing-title">You pay per token.<br />We run the GPUs.</h2>
+      <p className="workflow-lede">Your fine-tuned models are served from our infrastructure and billed per token, the way you pay for a frontier model today. There are no GPUs for you to rent, size or keep busy.</p>
+    </section>
+    <section className="closing" aria-labelledby="closing-title">
+      <h2 id="closing-title">A custom solution<br />for your work.</h2>
+      <p>Every app spends differently. Tell us what yours does and we’ll audit it with you and scope the models worth building.</p>
+      <BookCall className="cta cta-primary" href={calendlyUrl} />
+    </section>
+    </main>
+  );
+}

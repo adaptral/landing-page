@@ -1,41 +1,24 @@
-# Adaptral landing page
+# Adaptral
 
-One static page: Next.js (App Router), no runtime dependencies beyond Next and React.
+A minimal Next.js landing page with a real-time, perspective-projected neural network whose weights visibly update.
 
-```bash
+```sh
 npm install
-npm run dev      # http://localhost:3000
-npm run build    # production build, fully static
-npm run lint     # eslint, plus a check that globals.css uses tokens (no raw hex, rem or px)
-npm run logos    # regenerate logo/ and the icons the site serves
+npm run dev
 ```
 
-## Where things are
+`npm run build` creates a static production export in `out/`. `npm run typecheck` checks TypeScript.
 
-| What | File |
-| --- | --- |
-| Copy | `app/page.tsx` |
-| Title, description, keywords, links, booking URL | `app/site.ts` |
-| Design tokens (colour, type, space, shape, motion; light, dark and compact) | `app/tokens.css` |
-| Styles, built only from tokens | `app/globals.css` |
-| Metadata, JSON-LD, GA4, Clarity | `app/layout.tsx` |
-| robots.txt, sitemap.xml, manifest | `app/robots.ts`, `app/sitemap.ts`, `app/manifest.ts` |
-| Logo kit and its generator | `logo/`, `scripts/build-logos.mjs` |
+The foreground projects a small fully connected network in three dimensions (4-6-6-3 neurons on desktop, 3-5-5-2 on mobile) that sways gently. Connection thickness follows weight magnitude, a spread-out subset of connections print their weight, and individual updates travel along a connection as a rainbow pulse while the number rolls to its new value. A second canvas draws the loss surface, fading it out before the network. Its moving dot carries a shared spectrum across the grid and headline, then fades into the input layer, setting off a layer-by-layer pass of weight updates. Both use one animation clock. The canvas for the network is pinned to the viewport (`.network-stage`); the `.matrix` box only marks where the network sits in the layout.
 
-## Deploying to Vercel
+"Our partners" pulls the camera into the network: the outer network zooms past while a second network of case-study cards grows into place, joined by the same weighted, updating connections. The cards are real buttons laid out by CSS (`.studies-grid`); the canvas reads their positions and draws the wiring beneath them, and both ride one zoom transform. Selecting a card opens its case study. The two partners (Prorated and Bayvis) are in `src/components/case-studies.ts`; the "Book a call" link is `BOOK_CALL_URL` in `src/components/landing.tsx` and is empty for now.
 
-Import the repository; the defaults work. Then set these in Project > Settings > Environment Variables
-(all optional, see `.env.example`):
+All animations respect the system's reduced-motion preference; canvases pause offscreen and in background tabs.
 
-| Variable | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Canonical origin. Defaults to `https://adaptral.com`. |
-| `NEXT_PUBLIC_BOOKING_URL` | Target of "Book a call with us". The default is a placeholder. |
-| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager container. Defaults to `GTM-WL5XNF6H`. |
-| `NEXT_PUBLIC_GA_ID` | GA4 measurement ID (`G-…`), loaded directly. Leave unset if GA4 runs inside GTM. |
-| `NEXT_PUBLIC_CLARITY_ID` | Microsoft Clarity project. Defaults to `zfi6gshmki`. |
-| `GOOGLE_SITE_VERIFICATION` | Search Console HTML-tag token. |
+The Entrepreneurs First backing badge uses the user-provided artwork, stored locally in `public/ef-backing.png`.
 
-Tag Manager and Clarity always load; GA4 loads directly only when its ID is set. Clicking either booking link sends a
-`book_call_click` event to GA4 (with `location: header | cta`) and to Clarity; mark it as a key event in GA4.
-After the first deploy, submit `https://adaptral.com/sitemap.xml` in Search Console.
+## Pitch deck (`/deck`)
+
+The deck is live at `/deck` for now. To switch it off without deleting anything, rename `src/app/deck` to `src/app/_deck`: Next.js ignores folders that start with an underscore.
+
+A 14-slide deck for enterprise meetings, light-themed for projectors, built from pictures more than text (`art.tsx` holds the logos, icons and illustrations). Arrow keys, space or a clicker move between slides, `F` goes full screen, and printing gives one slide per page. The text you are likely to change (the CRM's placeholder name, the cost example's inputs, the three case studies (Prorated, Bayvis and SquareUp, all real companies) and cost and speed figures, the list of agent uses, the build-it-yourself table and the founders) is in `src/components/deck/content.ts`; the rest of the slides are in `slides.tsx`, and the styles in `src/app/deck/deck.css`. The cost and speed figures are estimates from public price lists, and each slide says so.
