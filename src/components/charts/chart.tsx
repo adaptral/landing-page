@@ -276,7 +276,10 @@ function Line({ spec }: { spec: LineSpec }) {
   const xs = spec.series.flatMap((s) => s.points.map((p) => p[0]));
   const ys = spec.series.flatMap((s) => s.points.map((p) => p[1]));
   const x = spec.xScale === "log" ? logScale(Math.min(...xs), Math.max(...xs)) : linearScale(Math.min(...xs), Math.max(...xs));
-  const y = linearScale(...extent(ys, { min: spec.yMin, max: spec.yMax, percent: spec.unit === "%" }));
+  const y =
+    spec.yScale === "log"
+      ? logScale(Math.min(...ys), Math.max(...ys))
+      : linearScale(...extent(ys, { min: spec.yMin, max: spec.yMax, percent: spec.unit === "%" }));
   const yFmt = (v: number) => format(v, spec);
   const xFmt = (v: number) => format(v, { prefix: spec.xPrefix, unit: spec.xUnit });
   const markers = spec.series.every((s) => s.points.length <= 24);
@@ -498,7 +501,7 @@ function BenchTable({ spec }: { spec: TableSpec }) {
                   const text =
                     v === null
                       ? String(cell ?? "–")
-                      : format(v, c) + (typeof cell === "object" && cell?.error ? ` ± ${format(cell.error, { decimals: c.decimals })}` : "");
+                      : format(v, { ...c, compact: false }) + (typeof cell === "object" && cell?.error ? ` ± ${format(cell.error, { decimals: c.decimals })}` : "");
                   const isBest = v !== null && best[c.key] === v;
                   return j === 0 ? (
                     <th key={c.key} scope="row">

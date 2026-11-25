@@ -48,6 +48,8 @@ export type LineSpec = Frame & {
   xPrefix?: string;
   xUnit?: string;
   xScale?: "linear" | "log";
+  /** "log" when values span orders of magnitude, e.g. monthly cost from $20 to $1M. */
+  yScale?: "linear" | "log";
   yMin?: number;
   yMax?: number;
   series: { name: string; points: [number, number][] }[];
@@ -123,6 +125,8 @@ export function parseSpec(raw: string, lang: string): ChartSpec {
     const l = s as LineSpec;
     need(Array.isArray(l.series) && l.series.length > 0 && l.series.length <= 8, "needs 1-8 `series`");
     need(l.series.every((x) => x.name && x.points?.length > 1 && x.points.every((p) => isNum(p[0]) && isNum(p[1]))), "each series needs a name and [x, y] points");
+    if (l.xScale === "log") need(l.series.every((x) => x.points.every((p) => p[0] > 0)), "a log x axis needs every x above 0");
+    if (l.yScale === "log") need(l.series.every((x) => x.points.every((p) => p[1] > 0)), "a log y axis needs every y above 0");
   }
   if (type === "scatter") {
     const p = s as ScatterSpec;
@@ -140,8 +144,8 @@ export function parseSpec(raw: string, lang: string): ChartSpec {
 }
 
 /** 1234.5 -> "1,234.5"; 25000 -> "25K". Decimals are fixed per chart so a column of values lines up. */
-export function format(v: number, o: { prefix?: string; unit?: string; decimals?: number } = {}): string {
-  const abs = Math.abs(v);
+export function format(v: number, o: { prefix?: string; unit?: string; decimals?: number; compact?: boolean } = {}): string {
+  const abs = o.compact === false ? 0 : Math.abs(v);
   let body: string;
   if (abs >= 1e9) body = `${trim(v / 1e9)}B`;
   else if (abs >= 1e6) body = `${trim(v / 1e6)}M`;

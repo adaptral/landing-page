@@ -122,7 +122,8 @@ Cost against quality, one dot per model.
 ```
 
 Up to 8 series; 4 or fewer get their names at the line ends when the ends do not crowd. Points get
-markers (with tooltips) when every series has 24 points or fewer. `xScale: "log"` for data size.
+markers (with tooltips) when every series has 24 points or fewer. `xScale: "log"` for data size,
+`yScale: "log"` when values span orders of magnitude (monthly cost at 100K vs 100M requests).
 `yMin`/`yMax` pin the axis; percentages stop at 100 automatically.
 
 ## table (benchmark table)
