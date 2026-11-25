@@ -52,21 +52,6 @@ export function SiteHeader({ current }: { current?: "blog" | "signal" }) {
   );
 }
 
-export function SiteFooter() {
-  return (
-    <footer className="content-footer">
-      <Wordmark />
-      <nav aria-label="Footer">
-        <Link href="/">Home</Link>
-        <Link href="/blog">Blog</Link>
-        <Link href="/signal">Signal</Link>
-        <a href="/feed.xml">RSS</a>
-      </nav>
-      <p>© {new Date().getFullYear()} Adaptral</p>
-    </footer>
-  );
-}
-
 export function Breadcrumbs({ items }: { items: { label: string; href: string }[] }) {
   return (
     <>

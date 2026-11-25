@@ -1,5 +1,6 @@
 import "../content.css";
-import { SiteFooter, SiteHeader } from "@/components/content/chrome";
+import { SiteHeader } from "@/components/content/chrome";
+import { SiteFooter } from "@/components/site-footer";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

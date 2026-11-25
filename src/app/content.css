@@ -55,21 +55,6 @@
 }
 .content-wordmark svg { width: 22px; height: 29px; }
 
-.content-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-5);
-  padding: var(--space-7) var(--gutter);
-  border-top: 1px solid var(--line);
-  color: var(--ink-muted);
-  font-size: var(--text-xs);
-}
-.content-footer nav { display: flex; gap: var(--space-5); }
-.content-footer a:not(.content-wordmark) { color: var(--ink-muted); text-decoration: none; }
-.content-footer a:not(.content-wordmark):hover { color: var(--ink); }
-.content-footer p { margin: 0; }
 
 .content-page a:focus-visible, .content-page summary:focus-visible { outline: 1px solid var(--focus); outline-offset: 4px; border-radius: var(--radius-xs); }
 
