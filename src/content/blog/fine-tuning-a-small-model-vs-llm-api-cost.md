@@ -5,6 +5,7 @@ description: "Fine-tuning a small model beats a flagship LLM API on cost from ab
 date: "2026-11-25"
 author: "Divyanshu Shekhar"
 tag: "Guide"
+image: "/blog/fine-tuning-a-small-model-vs-llm-api-cost.webp"
 tldr:
   - "At list prices, a flagship API costs about $16,000 per million requests of 1,000 tokens in and 200 out."
   - "A fine-tuned 8B model on one always-on H100 costs about $5,840 a month, so it wins on cost above roughly 365,000 requests a month."
